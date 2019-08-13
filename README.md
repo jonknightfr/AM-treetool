@@ -5,10 +5,10 @@ A shell script tool to export/import/clone Forgerock AM trees.
 A shell script which will export an AM authentication tree to standard output and re-import
 from standard input (optionally renaming the tree).
 
-# Usage: amtree.sh ( -i treename | -e treename ) -h <AM host URL> -u <AM admin> -p <AM admin password>"
+# Usage: 
+% amtree.sh ( -i treename | -e treename ) -h <AM host URL> -u <AM admin> -p <AM admin password>"
 
 # Examples:
-
 1) Export a tree called "Login" to a file:
 % ./amtree.sh -e Login -h https://openam.example.com/openam -u amadmin -p password > login.json
 

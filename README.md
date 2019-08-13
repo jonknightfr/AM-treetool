@@ -10,15 +10,19 @@ from standard input (optionally renaming the tree).
 
 ## Examples:
 1) Export a tree called "Login" to a file:
+
 % ./amtree.sh -e Login -h https://openam.example.com/openam -u amadmin -p password > login.json
 
 2) Import a tree a file and rename it to "LoginTree":
+
 % cat login.json | ./amtree.sh -i LoginTree -h https://openam.example.com/openam -u amadmin -p password
 
 3) Clone a tree called "Login" to a tree called "ClonedLogin":
+
 % ./amtree.sh -e Login -h https://openam.example.com/openam -u amadmin -p password | ./amtree.sh -i ClonedLogin -h https://openam.example.com/openam -u amadmin -p password
 
 4) Copy a tree called "Login" to a tree called "ClonedLogin" on another AM instance:
+
 % ./amtree.sh -e Login -h https://openam.example.com/openam -u amadmin -p password | ./amtree.sh -i ClonedLogin -h https://another.domain.org/openam -u amadmin -p password
 
 ## Limitations:

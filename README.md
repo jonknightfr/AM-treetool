@@ -13,7 +13,7 @@ from standard input (optionally renaming the tree).
 
 % ./amtree.sh -e Login -h https://openam.example.com/openam -u amadmin -p password > login.json
 
-2) Import a tree a file and rename it to "LoginTree":
+2) Import a tree from a file and rename it to "LoginTree":
 
 % cat login.json | ./amtree.sh -i LoginTree -h https://openam.example.com/openam -u amadmin -p password
 

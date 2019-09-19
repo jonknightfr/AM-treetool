@@ -48,6 +48,72 @@ function login {
 }
 
 
+# the admin ui leaves orphaned node instances after deleting a tree and when using the APIs it is very easy to 
+# forget to clean-up everything as well. the prune function will iterate through all node types, and then through 
+# all instances of each node type. Then it will iterate over all the trees and their nodes and check if any of 
+# the auth node type instances are orphaned and remove them.
+function prune {
+    echo "Analyzing authentication nodes configuration artifacts..."
+
+    #get all the trees and their node references
+    #these are all the nodes that are actively in use. every node instance we find in the next step, that is not in this list, is orphaned and will be removed/pruned.
+    JTREES=$(curl -s -k -X GET --data "{}" -H "iPlanetDirectoryPro:$ADMIN" $AM/json${REALM}/realm-config/authentication/authenticationtrees/trees?_queryFilter=true)
+    ACTIVENODES=($(echo $JTREES| jq -r  '.result|.[]|.nodes|keys|.[]'))
+    #echo $ACTIVENODES
+
+    #get all the node instances
+    JNODES=$(curl -s -k -X POST --data "{}" -H "iPlanetDirectoryPro:$ADMIN" -H  "Content-Type:application/json" -H "Accept-API-Version:resource=1.0" $AM/json${REALM}/realm-config/authentication/authenticationtrees/nodes?_action=nextdescendents)
+    NODES=($(echo $JNODES| jq -r  '.result|.[]|._id'))
+    ORPHANEDNODES=()
+
+    #find all the orphaned nodes
+    for NODE in "${NODES[@]}"
+    do
+        ORPHANED=true
+        for ACTIVENODE in "${ACTIVENODES[@]}"
+        do
+            if [ "$NODE" == "$ACTIVENODE" ] ; then
+                ORPHANED=false
+                break
+            fi
+        done
+        if [ "$ORPHANED" == "true" ] ; then
+            ORPHANEDNODES+=("$NODE")
+        fi
+    done
+
+    echo
+    echo "Total:    ${#NODES[@]}"
+    #echo "Active:   ${#ACTIVENODES[@]}"
+    echo "Orphaned: ${#ORPHANEDNODES[@]}"
+    echo 
+
+    if [[ ${#ORPHANEDNODES[@]} > 0 ]] ; then
+        read -p "Do you want to prune (permanently delete) all the orphaned node instances? (N/y): " -n 1 -r
+        echo    # (optional) move to a new line
+        if [[ $REPLY =~ ^[Yy]$ ]] ; then
+            echo -n "Pruning"
+            #delete all the orphaned nodes
+            for NODE in "${ORPHANEDNODES[@]}"
+            do
+                echo -n "."
+                TYPE=$(echo $JNODES | jq -r --arg id "$NODE" '.result|.[]|select(._id==$id)|._type|._id')
+                RESULT=$(curl -s -k -X DELETE -H "X-Requested-With:XmlHttpRequest" -H "iPlanetDirectoryPro:$ADMIN" $AM/json${REALM}/realm-config/authentication/authenticationtrees/nodes/$TYPE/$NODE)
+            done
+            echo
+            echo "Done."
+            exit 0
+        else
+            echo "Done."
+            exit 0
+        fi
+    else
+        echo "Nothing to prune."
+        exit 0
+    fi
+}
+
+
 function exportTree {
     TREE=$(curl -f -s -k -X GET -H "X-Requested-With:XmlHttpRequest" -H "iPlanetDirectoryPro:$ADMIN" $AM/json${REALM}/realm-config/authentication/authenticationtrees/trees/$1 | jq -c '. | del (._rev)')
     if [ -z "$TREE" ]; then
@@ -57,7 +123,8 @@ function exportTree {
 
     NODES=$(echo $TREE| jq -r  '.nodes | keys | .[]')
 
-    EXPORTS="{ \"innernodes\":{}, \"nodes\":{}, \"scripts\":{} }"
+    ORIGIN=$(md5<<<$AM$REALM)
+    EXPORTS="{ \"origin\":\"$ORIGIN\", \"innernodes\":{}, \"nodes\":{}, \"scripts\":{} }"
 
     for each in $NODES
     do
@@ -164,17 +231,39 @@ function importTree {
 
 
 function usage {
-    echo "Description: Export/import authentication tree and optionally rename the tree during import"
-    echo "Usage: $0 ( -i treename | -e treename ) -h <AM host URL> [-r <realm, defaut=/>] -u <AM admin> -p <AM admin password>"
-    exit
+    echo "Usage: $0 ( -e tree | -i tree | -P ) -h url [-r realm] -u user -p passwd"
+    echo
+    echo "Export/import/prune authentication trees."
+    echo
+    echo "Actions/tasks (must specify only one):"
+    echo "  -e tree   Export an authentication tree."
+    echo "  -i tree   Import an authentication tree."
+    echo "  -P        Prune orphaned configuration artifacts left behind after deleting"
+    echo "            authentication trees. You will be prompted before any destructive"
+    echo "            operations are performed."
+    echo 
+    echo "Mandatory parameters:"
+    echo "  -h url    Access Management host URL, e.g.: https://login.example.com/openam"
+    echo "  -u user   Username to login with. Must be an admin user with appropriate"
+    echo "            rights to manages authentication trees."
+    echo "  -p passwd Password."
+    echo
+    echo "Optional parameters:"
+    echo "  -r realm  Realm. If not specified, the root realm '/' is assumed. Specify"
+    echo "            realm as '/parent/child'. If using 'amadmin' as the user, login will"
+    echo "            happen against the root realm but subsequent operations will be"
+    echo "            performed in the realm specified. For all other users, login and"
+    echo "            subsequent operations will occur against the realm specified."
+    exit 0
 }
 
 
 TASK=""
-while getopts ":i:e:h:r:u:p:" arg; do
+while getopts ":i:e:h:r:u:p:P" arg; do
     case $arg in
         i) TASK="import"; TREENAME=$OPTARG;;
         e) TASK="export"; TREENAME=$OPTARG;;
+        P) TASK="prune";;
         h) AM=$OPTARG;;
         r) if [ $OPTARG == "/" ]; then REALM=""; else REALM=$OPTARG; fi;;
         u) AMADMIN=$OPTARG;;
@@ -183,14 +272,15 @@ while getopts ":i:e:h:r:u:p:" arg; do
    esac
 done
 
-login
-
-if [ "$TASK" == 'import' ]
-then
+if [ "$TASK" == 'import' ] ; then
+    login
     importTree $TREENAME
-elif [ "$TASK" == 'export' ]
-then
+elif [ "$TASK" == 'export' ] ; then
+    login
     exportTree $TREENAME
+elif [ "$TASK" == 'prune' ] ; then
+    login
+    prune
 else
     usage
 fi

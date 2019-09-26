@@ -8,31 +8,31 @@ A shell script which will export an AM authentication tree from any realm (defau
 ## Usage: 
 % amtree.sh ( -e tree | -i tree | -P ) -h url [-r realm] -u user -p passwd"  
   
-Export/import/prune authentication trees.  
+    Export/import/prune authentication trees.  
   
-Actions/tasks (must specify only one):  
-  -e tree   Export an authentication tree.  
-  -E        Export all the trees in a realm.  
-  -i tree   Import an authentication tree.  
-  -I        Import all the trees into a realm.  
-  -P        Prune orphaned configuration artifacts left behind after deleting  
-            authentication trees. You will be prompted before any destructive  
-            operations are performed.  
+    Actions/tasks (must specify only one):  
+      -e tree   Export an authentication tree.  
+      -E        Export all the trees in a realm.  
+      -i tree   Import an authentication tree.  
+      -I        Import all the trees into a realm.  
+      -P        Prune orphaned configuration artifacts left behind after deleting  
+                authentication trees. You will be prompted before any destructive  
+                operations are performed.  
   
-Mandatory parameters:  
-  -h url    Access Management host URL, e.g.: https://login.example.com/openam  
-  -u user   Username to login with. Must be an admin user with appropriate  
-            rights to manages authentication trees.  
-  -p passwd Password.  
+    Mandatory parameters:  
+      -h url    Access Management host URL, e.g.: https://login.example.com/openam  
+      -u user   Username to login with. Must be an admin user with appropriate  
+                rights to manages authentication trees.  
+      -p passwd Password.  
   
-Optional parameters:  
-  -r realm  Realm. If not specified, the root realm '/' is assumed. Specify  
-            realm as '/parent/child'. If using 'amadmin' as the user, login will  
-            happen against the root realm but subsequent operations will be  
-            performed in the realm specified. For all other users, login and  
-            subsequent operations will occur against the realm specified.  
-  -f file   If supplied, export to and import from <file>, otherwise use stdout  
-            and stdin.  
+    Optional parameters:  
+      -r realm  Realm. If not specified, the root realm '/' is assumed. Specify  
+                realm as '/parent/child'. If using 'amadmin' as the user, login will  
+                happen against the root realm but subsequent operations will be  
+                performed in the realm specified. For all other users, login and  
+                subsequent operations will occur against the realm specified.  
+      -f file   If supplied, export to and import from <file>, otherwise use stdout  
+                and stdin.  
 
 ## Examples:
 1) Export a tree called "Login" from the root realm to a file:  
@@ -64,7 +64,7 @@ Optional parameters:
    % ./amtree.sh -P -h https://openam.example.com/openam -u amadmin -p password  
    % ./amtree.sh -P -h https://openam.example.com/openam -r /parent/child -u amadmin -p password  
   
-   #Sample output during pruning:  
+   Sample output during pruning:  
        
    > Analyzing authentication nodes configuration artifacts...  
    >   

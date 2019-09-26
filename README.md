@@ -36,44 +36,44 @@ A shell script which will export an AM authentication tree from any realm (defau
 
 ## Examples:
 1) Export a tree called "Login" from the root realm to a file:  
-   % ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -e Login -f login.json  
-   % ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -e Login > login.json  
+    % ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -e Login -f login.json  
+    % ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -e Login > login.json  
   
 2) Import a tree into a sub-realm from a file and rename it to "LoginTree":  
-   % ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -i LoginTree -f login.json -r /parent/child  
-   % cat login.json | ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -i LoginTree -r /parent/child  
+    % ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -i LoginTree -f login.json -r /parent/child  
+    % cat login.json | ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -i LoginTree -r /parent/child  
   
 3) Export all the trees from the root realm to a file:  
-   % ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -E -f trees.json  
-   % ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -E > trees.json  
+    % ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -E -f trees.json  
+    % ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -E > trees.json  
   
 4) Import all the trees from a file into a sub-realm:  
-   % ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -I -f trees.json -r /parent/child  
-   % cat trees.json | ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -I -r /parent/child  
+    % ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -I -f trees.json -r /parent/child  
+    % cat trees.json | ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -I -r /parent/child  
   
 5) Clone a tree called "Login" to a tree called "ClonedLogin":  
-   % ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -e Login | ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -i ClonedLogin  
+    % ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -e Login | ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -i ClonedLogin  
   
 6) Copy a tree called "Login" to a tree called "ClonedLogin" on another AM instance:  
-   % ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -e Login | ./amtree.sh -h https://another.domain.org/openam -u amadmin -p password -i ClonedLogin  
+    % ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -e Login | ./amtree.sh -h https://another.domain.org/openam -u amadmin -p password -i ClonedLogin  
   
 7) Copy all the trees from one realm on one AM instnace to another realm on another AM instance:  
-   % ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -E -r /internal | ./amtree.sh -h https://another.domain.org/openam -u amadmin -p password -I -r /external  
+    % ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -E -r /internal | ./amtree.sh -h https://another.domain.org/openam -u amadmin -p password -I -r /external  
   
 8) Pruning:  
-   % ./amtree.sh -P -h https://openam.example.com/openam -u amadmin -p password  
-   % ./amtree.sh -P -h https://openam.example.com/openam -r /parent/child -u amadmin -p password  
+    % ./amtree.sh -P -h https://openam.example.com/openam -u amadmin -p password  
+    % ./amtree.sh -P -h https://openam.example.com/openam -r /parent/child -u amadmin -p password  
   
    Sample output during pruning:  
        
-   > Analyzing authentication nodes configuration artifacts...  
-   >   
-   > Total:    74  
-   > Orphaned: 37  
-   >   
-   > Do you want to prune (permanently delete) all the orphaned node instances? (N/y): y  
-   > Pruning.....................................  
-   > Done.
+    Analyzing authentication nodes configuration artifacts...  
+       
+    Total:    74  
+    Orphaned: 37  
+     
+    Do you want to prune (permanently delete) all the orphaned node instances? (N/y): y  
+    Pruning.....................................  
+    Done.
   
 ## Limitations:
 This tool can't export passwords (including API secrets, etc), so these need to be manually added back to an imported tree or alternatively, export the source tree to a file, edit the file to add the missing fields before importing. Any other dependencies than scripts needed for a tree must also exist prior to import, for example inner-trees and custom authentication JARs. Currently, scripts are NOT given a new UUID on import; an option to allow re-UUID-ing scripts might be added in the future.

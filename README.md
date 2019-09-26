@@ -6,8 +6,8 @@ A shell script which will export an AM authentication tree from any realm (defau
 
 
 ## Usage: 
-% amtree.sh ( -e tree | -i tree | -P ) -h url [-r realm] -u user -p passwd"  
-  
+    % amtree.sh ( -e tree | -i tree | -P ) -h url [-r realm] -u user -p passwd"  
+    
     Export/import/prune authentication trees.  
   
     Actions/tasks (must specify only one):  
@@ -18,13 +18,13 @@ A shell script which will export an AM authentication tree from any realm (defau
       -P        Prune orphaned configuration artifacts left behind after deleting  
                 authentication trees. You will be prompted before any destructive  
                 operations are performed.  
-  
+    
     Mandatory parameters:  
       -h url    Access Management host URL, e.g.: https://login.example.com/openam  
       -u user   Username to login with. Must be an admin user with appropriate  
                 rights to manages authentication trees.  
       -p passwd Password.  
-  
+    
     Optional parameters:  
       -r realm  Realm. If not specified, the root realm '/' is assumed. Specify  
                 realm as '/parent/child'. If using 'amadmin' as the user, login will  

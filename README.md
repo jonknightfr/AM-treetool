@@ -15,6 +15,7 @@ A shell script which will export an AM authentication tree from any realm (defau
       -E        Export all the trees in a realm.  
       -i tree   Import an authentication tree.  
       -I        Import all the trees into a realm.  
+      -l        List all the trees in a realm.  
       -P        Prune orphaned configuration artifacts left behind after deleting  
                 authentication trees. You will be prompted before any destructive  
                 operations are performed.  
@@ -31,8 +32,8 @@ A shell script which will export an AM authentication tree from any realm (defau
                 happen against the root realm but subsequent operations will be  
                 performed in the realm specified. For all other users, login and  
                 subsequent operations will occur against the realm specified.  
-      -f file   If supplied, export to and import from <file>, otherwise use stdout  
-                and stdin.  
+      -f file   If supplied, export/list to and import from <file>, otherwise use  
+                stdout and stdin.  
 
 ## Examples:
 1) Export a tree called "Login" from the root realm to a file:  
@@ -74,6 +75,10 @@ A shell script which will export an AM authentication tree from any realm (defau
     Do you want to prune (permanently delete) all the orphaned node instances? (N/y): y  
     Pruning.....................................  
     Done.
+  
+9) List all the trees from the root realm to a file or the console:  
+    % ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -l -f trees.txt  
+    % ./amtree.sh -h https://openam.example.com/openam -u amadmin -p password -l
   
 ## Limitations:
 This tool can't export passwords (including API secrets, etc), so these need to be manually added back to an imported tree or alternatively, export the source tree to a file, edit the file to add the missing fields before importing. Any other dependencies than scripts needed for a tree must also exist prior to import, for example inner-trees and custom authentication JARs. Currently, scripts are NOT given a new UUID on import; an option to allow re-UUID-ing scripts might be added in the future.

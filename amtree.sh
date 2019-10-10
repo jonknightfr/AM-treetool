@@ -127,6 +127,19 @@ function prune {
 }
 
 
+function listTrees {
+    local JTREES=$(curl -s -k -X GET --data "{}" -H "iPlanetDirectoryPro:$AMSESSION" $AM/json${REALM}/realm-config/authentication/authenticationtrees/trees?_queryFilter=true)
+    local TREES=($(echo $JTREES| jq -r '.result|.[]|._id'))
+    for TREE in "${TREES[@]}" ; do
+        if [[ -z $FILE ]] ; then
+            echo $TREE
+        else
+            echo $TREE >>$FILE
+        fi
+    done;
+}
+
+
 function exportAllTrees {
     local JTREES=$(curl -s -k -X GET --data "{}" -H "iPlanetDirectoryPro:$AMSESSION" $AM/json${REALM}/realm-config/authentication/authenticationtrees/trees?_queryFilter=true)
     local TREES=($(echo $JTREES| jq -r  '.result|.[]|._id'))
@@ -435,6 +448,7 @@ function usage {
     1>&2 echo "  -E        Export all the trees in a realm."
     1>&2 echo "  -i tree   Import an authentication tree."
     1>&2 echo "  -I        Import all the trees in a realm."
+    1>&2 echo "  -l        List all the trees in a realm."
     1>&2 echo "  -P        Prune orphaned configuration artifacts left behind after deleting"
     1>&2 echo "            authentication trees. You will be prompted before any destructive"
     1>&2 echo "            operations are performed."
@@ -451,19 +465,20 @@ function usage {
     1>&2 echo "            happen against the root realm but subsequent operations will be"
     1>&2 echo "            performed in the realm specified. For all other users, login and"
     1>&2 echo "            subsequent operations will occur against the realm specified."
-    1>&2 echo "  -f file   If supplied, export to and import from <file> instead of stdout"
+    1>&2 echo "  -f file   If supplied, export/list to and import from <file> instead of stdout"
     1>&2 echo "            and stdin."
     exit 0
 }
 
 
 TASK=""
-while getopts ":i:Ie:Eh:r:u:p:Pf:" arg; do
+while getopts ":i:Ie:Elh:r:u:p:Pf:" arg; do
     case $arg in
         e) TASK="export"; TREENAME="$OPTARG";;
         E) TASK="exportAll";;
         i) TASK="import"; TREENAME="$OPTARG";;
         I) TASK="importAll";;
+        l) TASK="list";;
         P) TASK="prune";;
         h) AM="$OPTARG";;
         r) if [ $OPTARG == "/" ]; then REALM=""; else REALM="$OPTARG"; fi;;
@@ -489,6 +504,9 @@ elif [ "$TASK" == 'export' ] ; then
 elif [ "$TASK" == 'exportAll' ] ; then
     login
     exportAllTrees
+elif [ "$TASK" == 'list' ] ; then
+    login
+    listTrees
 elif [ "$TASK" == 'prune' ] ; then
     login
     prune

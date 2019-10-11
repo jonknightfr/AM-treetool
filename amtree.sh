@@ -36,9 +36,10 @@ AMSESSION=""
 FILE=""
 ORIGIN_CMD="md5<<<\$AM\$REALM"
 if ! [ -x "$(command -v md5)" ]; then
-    echo 'Error: md5 is not installed.' >&2
     if [ -x "$(command -v md5sum)" ]; then
         ORIGIN_CMD="md5sum<<<\$AM\$REALM"
+    else
+        1>&2 echo 'Error: neither md5 nor md5sum is installed.'
     fi
 fi
 
@@ -186,7 +187,7 @@ function exportTree {
     local NODES=$(echo $TREE| jq -r  '.nodes | keys | .[]')
 
     local ORIGIN=$(eval $ORIGIN_CMD)
-    
+
     local EXPORTS="{ \"origin\":\"$ORIGIN\", \"innernodes\":{}, \"nodes\":{}, \"scripts\":{} }"
 
     for each in $NODES ; do

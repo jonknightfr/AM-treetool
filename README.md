@@ -6,7 +6,7 @@ A shell script which will export an AM authentication tree from any realm (defau
 
 
 ## Usage: 
-    % amtree.sh ( -e tree | -i tree | -P ) -h url [-r realm] -u user -p passwd"  
+    % amtree.sh ( -e tree | -E | -i tree | I | -l | -P ) -h url [-r realm -f file] -u user -p passwd  
     
     Export/import/prune authentication trees.  
   
